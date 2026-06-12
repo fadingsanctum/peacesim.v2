@@ -141,6 +141,40 @@
   }
 
   /* ──────────────────────────────────────────────
+     LANDSCAPE LOCK (mobile/small screens)
+  ────────────────────────────────────────────── */
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+           window.innerWidth <= 768;
+  }
+
+  // YouTube-style: rotate to landscape → fullscreen. Rotate back → exit.
+  function setupOrientationBehavior() {
+    if (!isMobile()) return;
+    window.addEventListener('orientationchange', onOrientationChange);
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', onOrientationChange);
+    }
+  }
+
+  function onOrientationChange() {
+    var isLandscape = window.innerWidth > window.innerHeight ||
+      (screen.orientation && screen.orientation.type.startsWith('landscape'));
+
+    if (isLandscape) {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(function() {});
+        if (elFullBtn) elFullBtn.textContent = '🡽';
+      }
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+        if (elFullBtn) elFullBtn.textContent = '⛶';
+      }
+    }
+  }
+
+  /* ──────────────────────────────────────────────
      FULLSCREEN
   ────────────────────────────────────────────── */
   function toggleFullscreen() {
@@ -217,6 +251,9 @@
         elVideo.play().catch(function() {});
       }
     });
+
+    // YouTube-style orientation behavior
+    setupOrientationBehavior();
 
     // Load first video
     loadVideo(0);

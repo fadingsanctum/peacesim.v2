@@ -406,6 +406,45 @@
   }
 
   /* ──────────────────────────────────────────────
+     LANDSCAPE LOCK (mobile)
+  ────────────────────────────────────────────── */
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+           window.innerWidth <= 768;
+  }
+
+  // YouTube-style: when user rotates to landscape, go fullscreen.
+  // When they rotate back to portrait, exit fullscreen.
+  function setupOrientationBehavior() {
+    if (!isMobile()) return;
+    window.addEventListener('orientationchange', onOrientationChange);
+    // screen.orientation API (more reliable on Android)
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', onOrientationChange);
+    }
+  }
+
+  function onOrientationChange() {
+    if (activeKind() !== 'video' || elVideoWrap.hidden) return;
+    const isLandscape = window.innerWidth > window.innerHeight ||
+      (screen.orientation && screen.orientation.type.startsWith('landscape'));
+
+    if (isLandscape) {
+      // Rotated to landscape — go fullscreen (YouTube behaviour)
+      if (!document.fullscreenElement && elVideoWrap.requestFullscreen) {
+        elVideoWrap.requestFullscreen().catch(() => {});
+      } else if (elVideo.webkitEnterFullscreen && !elVideo.webkitDisplayingFullscreen) {
+        elVideo.webkitEnterFullscreen();
+      }
+    } else {
+      // Rotated back to portrait — exit fullscreen
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  }
+
+  /* ──────────────────────────────────────────────
      FULLSCREEN
   ────────────────────────────────────────────── */
   function toggleFS() {
@@ -808,6 +847,7 @@
     checkAgreement();
     setupDragDrop();
     bindEvents();
+    setupOrientationBehavior();
   }
 
   if (document.readyState === 'loading') {
