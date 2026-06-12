@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Your Media — play local files directly in Peace Life. Nothing is uploaded.">
+  <title>Your Media | Peace Life</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/your-media.css">
+</head>
+<body class="ym-page">
+
+  <!-- ── AGREEMENT MODAL ── -->
+  <div id="ymAgreement" class="ym-modal" role="dialog" aria-modal="true" aria-labelledby="ymModalTitle" aria-describedby="ymModalDesc">
+    <div class="ym-modal-box">
+      <div class="ym-modal-icon" aria-hidden="true">🔒</div>
+      <h2 id="ymModalTitle" class="ym-modal-title">Temporary Local Playback</h2>
+      <p id="ymModalDesc" class="ym-modal-body">
+        Peace Life does not save your videos or music. Files are played temporarily
+        from your device and are <strong>never uploaded</strong> to our servers.
+        <br><br>
+        Do not delete your original file after loading it here. Keep the original
+        file safely stored on your device.
+      </p>
+      <button id="ymAgreeBtn" class="ym-btn-primary">I Understand</button>
+    </div>
+  </div>
+
+  <!-- ── PAGE LAYOUT ── -->
+  <div class="ym-layout" id="ymLayout">
+
+    <!-- ── HEADER ── -->
+    <header class="ym-header">
+      <a href="index.html" class="ym-back" aria-label="Back to Peace Life">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Peace Life</span>
+      </a>
+      <div class="ym-header-center">
+        <span class="ym-eyebrow">Local Playback</span>
+        <h1 class="ym-title">Your Media</h1>
+      </div>
+      <div class="ym-header-badge" aria-label="Privacy notice">
+        🔒 <span>Never uploaded</span>
+      </div>
+    </header>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="ym-main" id="ymMain">
+
+      <!-- EMPTY STATE / DROP ZONE -->
+      <div class="ym-dropzone" id="ymDropzone" role="region" aria-label="File drop zone">
+        <input
+          type="file"
+          id="ymFileInput"
+          accept="video/mp4,video/webm,video/quicktime,video/*,audio/mpeg,audio/wav,audio/mp4,audio/ogg,audio/flac,audio/x-flac,audio/*"
+          multiple
+          aria-label="Select media files"
+          tabindex="-1"
+        >
+        <div class="ym-drop-inner" id="ymDropInner">
+          <div class="ym-drop-icon" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1" stroke-opacity="0.15"/>
+              <path d="M16 30V32C16 33.1 16.9 34 18 34H30C31.1 34 32 33.1 32 32V30" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M24 14V28M24 14L20 18M24 14L28 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="ym-drop-title">Drop files here</h2>
+          <p class="ym-drop-sub">or tap to browse from your device</p>
+          <div class="ym-supported">
+            <span>Video: mp4 · webm · mov</span>
+            <span>Audio: mp3 · wav · m4a · ogg · flac</span>
+          </div>
+          <button class="ym-btn-primary" id="ymBrowseBtn" type="button">Browse Files</button>
+          <p class="ym-privacy-note" aria-live="polite">
+            🔒 Local playback only. Files never leave your device.
+          </p>
+        </div>
+      </div>
+
+      <!-- VIDEO PLAYER (hidden until a video file is active) -->
+      <div class="ym-video-wrap" id="ymVideoWrap" hidden aria-hidden="true">
+        <video id="ymVideo" playsinline preload="metadata" aria-label="Local video player"></video>
+        <div class="ym-video-overlay" id="ymVideoOverlay" aria-hidden="true"></div>
+        <!-- Big play/pause tap area on video -->
+        <button class="ym-video-tap" id="ymVideoTap" aria-label="Play or Pause" tabindex="-1"></button>
+
+        <!-- Video HUD -->
+        <div class="ym-video-hud">
+          <div class="ym-now-playing-label">Now Playing</div>
+          <div class="ym-now-playing-name" id="ymVideoName" aria-live="polite">—</div>
+        </div>
+
+        <!-- Video Controls -->
+        <div class="ym-video-controls glass" role="group" aria-label="Video controls">
+          <!-- Seek bar -->
+          <div class="ym-seek-row">
+            <span class="ym-time" id="ymVCurrent">0:00</span>
+            <div class="ym-seek-wrap" id="ymVSeekWrap" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <div class="ym-seek-track">
+                <div class="ym-seek-fill" id="ymVSeekFill"></div>
+                <div class="ym-seek-thumb" id="ymVSeekThumb"></div>
+              </div>
+            </div>
+            <span class="ym-time" id="ymVDuration">0:00</span>
+          </div>
+
+          <!-- Buttons row -->
+          <div class="ym-ctrl-row">
+            <!-- Loop -->
+            <button class="ym-ctrl-btn ym-ctrl-sm" id="ymVLoopBtn" aria-label="Toggle loop" title="Loop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            </button>
+            <!-- Prev -->
+            <button class="ym-ctrl-btn" id="ymVPrevBtn" aria-label="Previous file">⏮</button>
+            <!-- Play/Pause -->
+            <button class="ym-ctrl-btn ym-ctrl-play" id="ymVPlayBtn" aria-label="Play">▶</button>
+            <!-- Next -->
+            <button class="ym-ctrl-btn" id="ymVNextBtn" aria-label="Next file">⏭</button>
+            <!-- Speed -->
+            <button class="ym-ctrl-btn ym-ctrl-sm ym-speed-btn" id="ymVSpeedBtn" aria-label="Playback speed" title="Speed">1×</button>
+            <!-- Volume -->
+            <div class="ym-vol-group">
+              <button class="ym-ctrl-btn ym-ctrl-sm" id="ymVMuteBtn" aria-label="Mute">🔊</button>
+              <input type="range" class="ym-vol-slider" id="ymVVol" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+            </div>
+            <!-- Fullscreen -->
+            <button class="ym-ctrl-btn ym-ctrl-sm" id="ymVFSBtn" aria-label="Fullscreen">⛶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIO PLAYER (hidden until an audio file is active) -->
+      <div class="ym-audio-wrap" id="ymAudioWrap" hidden aria-hidden="true">
+        <!-- Visualizer Canvas -->
+        <div class="ym-viz-area">
+          <canvas id="ymVizCanvas" aria-hidden="true"></canvas>
+          <div class="ym-audio-art" id="ymAudioArt" aria-hidden="true">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+              <circle cx="28" cy="28" r="27" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.2"/>
+              <path d="M22 18v14.5M22 18l14-3v14.5M22 32.5a3 3 0 1 0 0-1M36 29.5a3 3 0 1 0 0-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="ym-audio-now">
+            <div class="ym-now-playing-label">Now Playing</div>
+            <div class="ym-now-playing-name" id="ymAudioName" aria-live="polite">—</div>
+          </div>
+        </div>
+
+        <!-- Audio Controls -->
+        <div class="ym-audio-controls">
+          <!-- Seek -->
+          <div class="ym-seek-row">
+            <span class="ym-time" id="ymACurrent">0:00</span>
+            <div class="ym-seek-wrap" id="ymASeekWrap" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <div class="ym-seek-track">
+                <div class="ym-seek-fill" id="ymASeekFill"></div>
+                <div class="ym-seek-thumb" id="ymASeekThumb"></div>
+              </div>
+            </div>
+            <span class="ym-time" id="ymADuration">0:00</span>
+          </div>
+
+          <!-- Main controls -->
+          <div class="ym-ctrl-row">
+            <button class="ym-ctrl-btn ym-ctrl-sm" id="ymAShuffleBtn" aria-label="Shuffle" title="Shuffle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                <line x1="4" y1="4" x2="9" y2="9"/>
+              </svg>
+            </button>
+            <button class="ym-ctrl-btn" id="ymAPrevBtn" aria-label="Previous">⏮</button>
+            <button class="ym-ctrl-btn ym-ctrl-play" id="ymAPlayBtn" aria-label="Play">▶</button>
+            <button class="ym-ctrl-btn" id="ymANextBtn" aria-label="Next">⏭</button>
+            <button class="ym-ctrl-btn ym-ctrl-sm" id="ymALoopBtn" aria-label="Loop" title="Loop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Volume + Speed -->
+          <div class="ym-ctrl-row ym-ctrl-row-aux">
+            <button class="ym-ctrl-btn ym-ctrl-sm" id="ymAMuteBtn" aria-label="Mute">🔊</button>
+            <input type="range" class="ym-vol-slider" id="ymAVol" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+            <button class="ym-ctrl-btn ym-ctrl-sm ym-speed-btn" id="ymASpeedBtn" aria-label="Playback speed" title="Speed">1×</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILE QUEUE (visible when files are loaded) -->
+      <div class="ym-queue" id="ymQueue" hidden aria-hidden="true">
+        <div class="ym-queue-header">
+          <span class="ym-queue-label">Queue</span>
+          <span class="ym-queue-count" id="ymQueueCount">0 files</span>
+          <button class="ym-queue-add-btn" id="ymQueueAdd" aria-label="Add more files" title="Add more files">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/>
+            </svg>
+            Add files
+          </button>
+        </div>
+        <div class="ym-queue-list" id="ymQueueList" role="list" aria-label="Queued files"></div>
+        <p class="ym-privacy-note ym-privacy-note-queue">
+          🔒 Local playback only. Files never leave your device.
+        </p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── PAGE FADE ── -->
+  <div id="pageFade" aria-hidden="true"></div>
+
+  <!-- Hidden audio element for audio mode -->
+  <audio id="ymAudio" preload="metadata" aria-hidden="true"></audio>
+
+  <script src="js/your-media.js" defer></script>
+  <script src="js/transition.js" defer></script>
+</body>
+</html>

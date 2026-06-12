@@ -10,6 +10,39 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── YOUR MEDIA DOOR ── */
+    .your-media {
+      background-image: url('images/doors/your-media.jpg');
+      background-color: #0c0c14; /* fallback if image missing */
+    }
+    /* Fallback gradient if no image */
+    .your-media:not([style*="background-image"]) {
+      background: linear-gradient(160deg, #0c0c18 0%, #12122a 50%, #0a1420 100%);
+    }
+    .your-media:hover {
+      box-shadow:
+        0 30px 60px rgba(139,92,246,0.35),
+        0 0 40px rgba(139,92,246,0.25);
+      border-color: rgba(139,92,246,0.45);
+    }
+    .your-media .door-badge {
+      color: #a78bfa;
+      border-color: rgba(139,92,246,0.3);
+    }
+    /* No-image fallback: show a subtle icon */
+    .your-media-icon {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -62%);
+      font-size: 36px;
+      opacity: 0.18;
+      z-index: 2;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
 </head>
 <body class="home">
 
@@ -72,6 +105,16 @@
         <span class="door-world">World 04</span>
         <span class="door-name">Peace</span>
         <span class="door-badge">✦ Enter</span>
+      </div>
+    </a>
+
+    <!-- ── YOUR MEDIA DOOR ── -->
+    <a href="your-media.html" class="door your-media" role="listitem" aria-label="Open Your Media — play local files">
+      <span class="your-media-icon" aria-hidden="true">📁</span>
+      <div class="door-content">
+        <span class="door-world">Your Files</span>
+        <span class="door-name">Your Media</span>
+        <span class="door-badge">▶ Play</span>
       </div>
     </a>
   </div>
